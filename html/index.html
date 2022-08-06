@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+    <html lang="zh">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width= device-width, initial-scale = 1 ">
+        <link href="../css/style.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    </head>
+
+    <body>
+        <div id="myApp">
+            <ol>
+                <game-item v-for="item in games " v-bind:game="item"></game-item>
+            </ol>
+        </div>
+        <div id="filterFunction">
+            <p>{{message}}</p>
+            <p>{{message | toupper}}</p>
+            <p>{{num | addNum}}</p>
+        </div>
+        
+        <div id ="loopFunction">
+            <p v-for ="game in games">{{game.title | loopToUpper}} </p>
+        </div>
+    </body>
+    <script>
+        Vue.component('game-item', { 
+            props: ['game'],
+            template: '<li>{{game.title}}</li>'
+        });
+        var myApp = new Vue({
+            el: "#myApp",
+            data: {
+                games: [
+                    { title: '狼人殺' }, 
+                    { title: 'APEX' }, 
+                    { title: '遊戲3' }]
+            }
+        })
+        var filterApp = new Vue({
+            el:"#filterFunction",
+            data :{
+                message :"Hello World!!",
+                num :13
+            },
+            filters:{
+                toupper : function(value){
+                    return value.toUpperCase();
+                },
+                addNum : function(num){
+                    return num+100000;
+                }
+            }
+
+        })
+        var loop = new Vue({
+            el:"#loopFunction",
+            data:{
+                games : [
+                    {title : "game1"},
+                    {title : "hello game"},
+                    {title : "Test game "}
+                ]
+            },
+            filters :{
+                loopToUpper : function(gameTitle){
+                    return gameTitle.toUpperCase();
+                }
+            }
+        })
+    </script>
+
+    </html>
