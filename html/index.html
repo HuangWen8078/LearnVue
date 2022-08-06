@@ -1,75 +1,170 @@
 <!DOCTYPE html>
-    <html lang="zh">
+<html lang="zh">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width= device-width, initial-scale = 1 ">
-        <link href="../css/style.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width= device-width, initial-scale = 1 ">
+    <link href="../css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-    </head>
+</head>
 
-    <body>
-        <div id="myApp">
-            <ol>
-                <game-item v-for="item in games " v-bind:game="item"></game-item>
-            </ol>
-        </div>
-        <div id="filterFunction">
-            <p>{{message}}</p>
-            <p>{{message | toupper}}</p>
-            <p>{{num | addNum}}</p>
-        </div>
-        
-        <div id ="loopFunction">
-            <p v-for ="game in games">{{game.title | loopToUpper}} </p>
-        </div>
-    </body>
-    <script>
-        Vue.component('game-item', { 
-            props: ['game'],
-            template: '<li>{{game.title}}</li>'
-        });
-        var myApp = new Vue({
-            el: "#myApp",
-            data: {
-                games: [
-                    { title: '狼人殺' }, 
-                    { title: 'APEX' }, 
-                    { title: '遊戲3' }]
-            }
-        })
-        var filterApp = new Vue({
-            el:"#filterFunction",
-            data :{
-                message :"Hello World!!",
-                num :13
+<body>
+    <div id="myApp">
+        <ol>
+            <game-item v-for="item in games " v-bind:game="item"></game-item>
+        </ol>
+    </div>
+    
+    <div id="filterFunction">
+        <p>{{message}}</p>
+        <p>{{message | toupper}}</p>
+        <p>{{num | addNum}}</p>
+    </div>
+
+    <div id="loopFunction">
+        <p v-for="game in games">{{game.title | loopToUpper}} </p>
+    </div>
+
+    <div id="computedDiv">
+        Calculate frontend :{{price}} dollar , Tax price {{priceTax}}
+    </div>
+
+    <div id="watchDiv">
+        <p>Calculate dollar : {{price}} dollar , count click : {{count}} after click price {{afterClickCount}}</p>
+        <button @click="btnClick(1000)">加一次</button>
+    </div>
+
+    <div id="setGetComputed">
+        <p>calculate {{price}} dollar , afterClick {{afterClick}} , afterCalculate: {{afterCalculate}}</p>
+        <button @Click="btnClickComput(10000)">afterClick change to 10000</button>
+    </div>
+
+    <div id="bindClass">
+        <p v-bind:class="{active:isActive}">text red</p>
+        <p :class="{active : isActive}">text red secound</p> 
+        <button @click="changeClass()">changeClass</button>
+    </div>
+</body>
+<script>
+    Vue.component('game-item', {
+        props: ['game'],
+        template: '<li>{{game.title}}</li>'
+    });
+    var myApp = new Vue({
+        el: "#myApp",
+        data: {
+            games: [
+                { title: '狼人殺' },
+                { title: 'APEX' },
+                { title: '遊戲3' }]
+        }
+    });
+    var filterApp = new Vue({
+        el: "#filterFunction",
+        data: {
+            message: "Hello World!!",
+            num: 13
+        },
+        filters: {
+            toupper: function (value) {
+                return value.toUpperCase();
             },
-            filters:{
-                toupper : function(value){
-                    return value.toUpperCase();
+            addNum: function (num) {
+                return num + 100000;
+            }
+        }
+
+    });
+    var loop = new Vue({
+        el: "#loopFunction",
+        data: {
+            games: [
+                { title: "game1" },
+                { title: "hello game" },
+                { title: "Test game " }
+            ]
+        },
+        filters: {
+            loopToUpper: function (gameTitle) {
+                return gameTitle.toUpperCase();
+            }
+        }
+    });
+    //計算屬性
+    var computed = new Vue({
+        el:"#computedDiv",
+        data : {
+            price : 2000
+        },
+        computed : {
+            priceTax : function (){
+                return this.price*1.3;
+            }
+        }
+    });
+    //watch 內部屬性會因為該值異動觸發相對應所需改變的值
+    var watch = new Vue({
+        el:"#watchDiv",
+        data:{
+            price:1000,
+            count:0, 
+            afterClickCount:0
+        },
+        watch:{
+            price : function(newVal,oldVal){
+                console.log(newVal,oldVal);
+                this.count =this.count+1;    
+                this.afterClickCount=this.price*this.count;
+            }
+        },
+        methods:{
+            btnClick:function(newPrice){
+                this.price +=newPrice; 
+                         
+            },
+        }
+
+    });
+
+    var setGetComputed = new Vue({
+        el:"#setGetComputed",
+        data : {
+            price : 7000
+        },
+        computed :{
+            afterClick : {
+                get: function(){
+                    return this.price * 1.3
                 },
-                addNum : function(num){
-                    return num+100000;
-                }
-            }
-
-        })
-        var loop = new Vue({
-            el:"#loopFunction",
-            data:{
-                games : [
-                    {title : "game1"},
-                    {title : "hello game"},
-                    {title : "Test game "}
-                ]
+                set: function(value){
+                    this.price = value / 2;
+                }                
             },
-            filters :{
-                loopToUpper : function(gameTitle){
-                    return gameTitle.toUpperCase();
-                }
+            afterCalculate: function(){
+                return this.afterClick * 2.8
             }
-        })
-    </script>
+        },
+        methods:{
+            btnClickComput: function(newPrice){
+                this.afterClick =  newPrice;
+            }
+        }
+    })
+    
+    var bindClass = new Vue({
+        el:"#bindClass",
+        data : {
+            isActive:true,            
+        },
+        methods : {
+            changeClass : function(){
+                this.isActive = !this.isActive;
+            }
+           
+        }
 
-    </html>
+    })
+</script>
+
+</html>
